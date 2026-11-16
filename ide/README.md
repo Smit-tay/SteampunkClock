@@ -1,22 +1,26 @@
 # IDE Setup
 
-## Geany
+The code is built in a container (`steampunkclock_dev`, Fedora 44 like the worker, with cmake, ninja, g++ and the
+OpenCV, libcurl and nlohmann-json development packages), so the host needs only podman. `~/dev` is mounted at the
+same path inside the container, so source paths and `build/compile_commands.json` are valid on the host too, for
+clangd.
 
-The `steampunkclock.geany` project file is provided in the project root.
+## Files
 
-### Prerequisites
-- Geany installed on the host
-- Container running: `podman-compose up -d` (from the topicfs directory)
-- Project built at least once: Build SteampunkClock from the Build menu
+- `Containerfile.build`: the build image. Rebuild it only when this file changes:
+  `podman build -t steampunkclock_dev -f ide/Containerfile.build ide`
+- `cmake-in-container.sh`: runs `cmake` with its arguments inside the image.
 
-### Setup
-1. Open Geany
-2. Open the workbench file: Tools → Workbench → Open
-3. Select `smithjack.geanywb` — this file lives one level above the SteampunkClock
-   repository root, in the same directory where you cloned the project
-4. Double-click SteampunkClock in the Workbench tab
+## Build
 
-## Other IDEs
+```sh
+./ide/cmake-in-container.sh -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+./ide/cmake-in-container.sh --build build
+```
 
-Contributions welcome. Please add a subdirectory here with configuration
-files and a README explaining the setup process.
+Deploy from the host (the container has no network): `cmake --build build --target deploy-spclock`.
+
+## VS Code
+
+`.vscode/tasks.json` has the image build, Build, Clean and Deploy to worker. `.vscode/settings.json` points the CMake
+extension at the wrapper script and clangd at `build/`.

@@ -69,5 +69,11 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "map": "cpp"
-    }
+       },
+    "cmake.cmakePath": "${workspaceFolder}/ide/cmake-in-container.sh",
+    "cmake.generator": "Ninja",
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.configureOnOpen": false,
+    "cmake.useCMakePresets": "never",
+    "clangd.arguments": ["--compile-commands-dir=${workspaceFolder}/build"]
 }

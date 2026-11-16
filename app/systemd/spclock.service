@@ -1,0 +1,26 @@
+# spclock.service — the SteampunkClock web service (robot.smithjack.net clock.php talks to it).
+# MIT License — Copyright 2026 Jack Sidman Smith
+#
+# Listens on 127.0.0.1:8765 only. Runs as jack: the state, model and training data live in
+# ~jack/steampunkclock. The binary is in /usr/local/bin because SELinux does not let system
+# services execute programs from home directories.
+# Install: install -m 755 spclock /usr/local/bin/ && cp spclock.service /etc/systemd/system/
+#          && systemctl daemon-reload && systemctl enable --now spclock
+
+[Unit]
+Description=SteampunkClock web service (spclock serve)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=jack
+Group=jack
+WorkingDirectory=/home/jack/steampunkclock
+ExecStart=/usr/local/bin/spclock -c /home/jack/steampunkclock/spclock.json serve 8765
+Restart=on-failure
+RestartSec=5
+# Let a running tile exchange finish: stopping waits for it.
+TimeoutStopSec=90
+
+[Install]
+WantedBy=multi-user.target

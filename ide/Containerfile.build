@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Build image for SteampunkClock: toolchain only, no source, no ROS2.
+# Same distro as the worker (Fedora 44), so the binary and its OpenCV/libcurl runtime match.
+FROM registry.fedoraproject.org/fedora:44
+RUN dnf -y install cmake ninja-build gcc-c++ make opencv-devel libcurl-devel json-devel && dnf clean all

@@ -1,0 +1,62 @@
+{
+  "_comment": "SteampunkClock (spclock) configuration. Lengths in mm, angles in degrees, robot frame = uArm frame.",
+  "topicfs": "/mnt/topicfs/swiftpro",
+  "lock_file": "/var/lib/robot/robot_move.lock",
+  "state_file": "spclock_state.json",
+  "model_file": "digits.yml",
+  "data_dir": "data",
+  "camera": {
+    "url": "http://robotcam:8080",
+    "auth_file": "camera.auth",
+    "_auth_comment": "one line user:password, mode 600, next to this file on the worker; not in the repo",
+    "hi_res": "1600x1200",
+    "lo_res": "800x600",
+    "settle_s": 3.0
+  },
+  "calibration": {
+    "_comment": "2026-11-16: robot->grid from 5 tile drops (sorter/calib_grid.py), image->grid from the drawn 100 mm grid in the 1600x1200 image (sorter/grid_cal.json)",
+    "robot_to_grid": [[-0.7527907841006864, 0.7206496705113041, 307.9576153458943],
+                      [0.7289817571539585, 0.7457775161832629, -31.056486772769407]],
+    "image_to_grid": [[0.41469624817288614, 0.2304475959745001, -355.737721757375],
+                      [-0.23796310310559946, 0.411227406902352, 54.35807127453747],
+                      [-3.1071486507814137e-06, -3.593820698212938e-05, 1.0]],
+    "image_size": [1600, 1200],
+    "surface_z0": 9.78,
+    "surface_per_mm": -0.0527,
+    "seal_above_surface": 2.5,
+    "seals": [[160, 180, 0.1], [210, 160, -0.6], [100, 130, 3.6], [120, -175, 2.1], [190, -190, -0.9],
+              [183.1, -89.9, 1.57], [235.1, -52.5, 0.56]],
+    "cup_offset": [-0.99, 2.19],
+    "hang": 1.5
+  },
+  "tile": { "long": 40.0, "short": 30.0, "height": 3.5 },
+  "motion": {
+    "travel_z": 30.0,
+    "park": [120.0, -220.0, 100.0],
+    "speed_fast": 100.0,
+    "speed_near": 60.0,
+    "speed_final": 20.0,
+    "approach": 3.0,
+    "press": 2.5,
+    "search_step": 2.0,
+    "wrist_scale": 1.105,
+    "place_corrections": [[245, -65, 1.875, 0.625], [321.5, -53.4, 2.5, 0.875], [295.0, -81.1, -1.25, -0.625], [261.8, -115.7, -1.5, -0.5], [235.3, -143.4, -0.75, -1.0], [205, -70, -1.125, 1.0]],
+    "_place_comment": "x, y, dx, dy: mm added to place targets near (x, y); from spclock calplace",
+    "vacuum_s": 0.25,
+    "release_s": 0.2,
+    "reach_min": 135.0,
+    "reach_max": 330.0
+  },
+  "layout": {
+    "_comment": "Keypad of stacks on the drawn grid: cell k at grid (row_x0 + row_pitch*(k/3), col_y0 + col_pitch*(k%3)); digit tops along grid -x",
+    "row_x0": 175.0, "row_pitch": 55.0,
+    "col_y0": 225.0, "col_pitch": -50.0,
+    "max_stack": 4,
+    "up_grid_deg": 180.0,
+    "photo_spot": [245.0, -65.0],
+    "_photo_comment": "photo_spot is in the ROBOT frame (free table where the heap was); temp_cell is a keypad cell index",
+    "temp_cell": 11,
+    "display_grid": [[27.5, 163.5], [27.5, 123.5], [27.5, 73.5], [27.5, 33.5]],
+    "_display_comment": "H1 H2 M1 M2 in grid mm, 40 mm pitch with a 10 mm colon gap, centred on the user's coin at grid (27.5, 98.5) on the centre line; Hh left, Mm right (2026-11-15)"
+  }
+}
