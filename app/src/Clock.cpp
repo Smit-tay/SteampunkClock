@@ -81,8 +81,9 @@ void show(App& app, const std::string& time, const DigitNet* preloaded, const Pr
             if (st.display[i].digit >= 0) {
                 if (const auto t = locateTile(img, app.geo, st.display[i].xy, 15.0, net)) {
                     slotTile[i] = Pose{t->pose.xy, up};  // its own up only matters to within a few degrees
-                    if (std::abs(wrap180(t->pose.up - up)) < 45.0) {
-                        slotTile[i]->up = t->pose.up;
+                    const Pose seen = nearerTop(t->pose, up, DigitNet::halfTurnSymmetric(st.display[i].digit));
+                    if (std::abs(wrap180(seen.up - up)) < 45.0) {
+                        slotTile[i]->up = seen.up;
                     }
                 }
             }
@@ -93,9 +94,11 @@ void show(App& app, const std::string& time, const DigitNet* preloaded, const Pr
                 used = used || wanted(i) == sk.digit;
             }
             if (sk.n > 0 && used) {
-                if (const auto t = locateTile(img, app.geo, sk.xy, 12.0, net);
-                    t && std::abs(wrap180(t->pose.up - up)) < 45.0) {
-                    stackTop[sk.key] = t->pose;
+                if (const auto t = locateTile(img, app.geo, sk.xy, 12.0, net)) {
+                    const Pose seen = nearerTop(t->pose, up, DigitNet::halfTurnSymmetric(sk.digit));
+                    if (std::abs(wrap180(seen.up - up)) < 45.0) {
+                        stackTop[sk.key] = seen;
+                    }
                 }
             }
         }
@@ -138,9 +141,11 @@ void show(App& app, const std::string& time, const DigitNet* preloaded, const Pr
             // A top not seen yet (the tile under one just taken): look before picking; lower
             // tiles of a stack can lie several mm off its nominal spot.
             app.mover.clearView({from->xy}, 25.0);
-            if (const auto t = locateTile(app.cam.grab(Camera::Res::Hi), app.geo, from->xy, 15.0, net);
-                t && std::abs(wrap180(t->pose.up - up)) < 45.0) {
-                stackTop[from->key] = t->pose;
+            if (const auto t = locateTile(app.cam.grab(Camera::Res::Hi), app.geo, from->xy, 15.0, net)) {
+                const Pose seen = nearerTop(t->pose, up, DigitNet::halfTurnSymmetric(from->digit));
+                if (std::abs(wrap180(seen.up - up)) < 45.0) {
+                    stackTop[from->key] = seen;
+                }
             }
         }
         const auto seen = stackTop.find(from->key);

@@ -9,6 +9,7 @@
 #include <nlohmann/json_fwd.hpp>
 #include <opencv2/core.hpp>
 
+#include <cmath>
 #include <vector>
 
 namespace spc {
@@ -21,6 +22,16 @@ struct Pose {
 
 // Wrap an angle to [-180, 180).
 double wrap180(double deg);
+
+// A tile that reads the same turned half round (0, 8): of its two possible tops, the one
+// nearer `wanted`, so it is not turned round for nothing. Other tiles: unchanged.
+[[nodiscard]] inline Pose nearerTop(Pose p, double wanted, bool halfTurnSymmetric)
+{
+    if (halfTurnSymmetric && std::abs(wrap180(p.up - wanted)) > 90.0) {
+        p.up = wrap180(p.up + 180.0);
+    }
+    return p;
+}
 
 class Geometry {
 public:

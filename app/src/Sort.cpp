@@ -120,8 +120,7 @@ private:
     [[nodiscard]] const HeapTile* choose(const std::vector<HeapTile>& tiles) const
     {
         for (const auto& t : tiles) {  // best first
-            const double r = std::hypot(t.pose.xy.x, t.pose.xy.y);
-            if (r < 135.0 || r > 300.0) {
+            if (!app_.mover.inReach(t.pose.xy)) {  // motion.reach_min .. reach_max
                 continue;
             }
             const auto f = fails_.find(spotKey(t.pose.xy));
@@ -194,7 +193,10 @@ private:
         const auto check = found ? found->reading : readAt(after, app_.geo, net_, target);
         ++dst->n;
         st_.save(app_.stateFile);
-        const bool upright = check.quarter == 0 || (check.quarter == 2 && DigitNet::halfTurnSymmetric(check.digit));
+        // locateTile has already turned the pose to the digit's top (its quarter is relative to
+        // its first guess); readAt reads at the target pose, so its quarter is the offset.
+        const double off = found ? std::abs(wrap180(landed.up - target.up)) : 90.0 * check.quarter;
+        const bool upright = off < 45.0 || (DigitNet::halfTurnSymmetric(check.digit) && off > 135.0 && off < 225.0);
         if (check.digit != t.reading.digit || !upright) {
             log("sort: WARNING stack ", dst->key, " top reads \"", check.digit, "\" quarter ", check.quarter,
                 " (margin ", check.margin, ")");

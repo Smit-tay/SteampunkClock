@@ -237,7 +237,8 @@ int calplace(spc::App& app, const std::string& key)
             if (!here) {
                 throw std::runtime_error("calplace: lost the tile");
             }
-            const spc::Pose src{here->pose.xy, here->pose.up};
+            const spc::Pose src = spc::nearerTop(here->pose, app.upStack,
+                                                 spc::DigitNet::halfTurnSymmetric(here->reading.digit));
             app.mover.carry(src, 0, {targets[k], app.upStack}, 0);
             app.mover.clearView({targets[k]}, 25.0);
             const auto there = spc::locateTile(app.cam.grab(spc::Camera::Res::Hi), app.geo, targets[k], 20.0, &net);
@@ -255,7 +256,9 @@ int calplace(spc::App& app, const std::string& key)
     app.mover.clearView({last}, 25.0);
     const auto here = spc::locateTile(app.cam.grab(spc::Camera::Res::Hi), app.geo, last, 20.0, &net);
     app.mover.setCorrection(true);
-    app.mover.carry(here ? here->pose : spc::Pose{last, app.upStack}, 0, {stack->xy, app.upStack}, stack->n);
+    app.mover.carry(here ? spc::nearerTop(here->pose, app.upStack, spc::DigitNet::halfTurnSymmetric(here->reading.digit))
+                         : spc::Pose{last, app.upStack},
+                    0, {stack->xy, app.upStack}, stack->n);
     ++stack->n;
     st.save(app.stateFile);
     std::cout << "\"place_corrections\": [";
